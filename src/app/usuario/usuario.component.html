@@ -1,0 +1,100 @@
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+            
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="usuarios" [rows]="5" [paginator]="true"
+        [globalFilterFields]="['nombre']" [(selection)]="selectedUsuarios"
+        [rowHover]="true" dataKey="id" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h3 class="p-m-0">Administracion de Usuarios</h3>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <!--<th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>-->
+                <th  pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="edad">Edad <p-sortIcon field="edad"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="fechaingreso">Fecha de Ingreso <p-sortIcon field="fechaingreso"></p-sortIcon>
+                </th>
+                <th style="width: 10rem"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-usuario>
+            <tr>
+                <!--<td>
+                    <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
+                </td>-->
+                <td>{{usuario.nombre}}</td>
+                <td>{{usuario.edad}}</td>
+                <td>{{(usuario.cargo)? usuario.cargo.nombre : null}}</td>
+                <td>{{usuario.fechaingreso}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editUsuario(usuario)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                        (click)="deleteUsuario(usuario)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                En total hay {{usuarios ? usuarios.length : 0 }} Kpis de usuarios.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="usuarioDialog" [style]="{width: '30vw'}" header="Usuario Details" [modal]="true">
+    <ng-template pTemplate="content">
+        <div class="p-fluid p-formgrid p-grid">
+            <div class="p-field p-col-12 p-md-12">
+                <label for="name">Nombre del usuario</label>
+                <input type="text" pInputText id="nombre" [(ngModel)]="usuario.nombre" required autofocus />
+                <small class="p-invalid" *ngIf="submitted && !usuario.nombre">Name is required.</small>
+            </div>
+            <div class="p-field p-col-12 p-md-12">
+                <label for="name">Edad</label>
+                <input type="number" pInputText id="edad" [(ngModel)]="usuario.edad" required autofocus />
+                <small class="p-invalid" *ngIf="submitted && !usuario.edad">Edad is required.</small>
+            </div>
+            <div class="p-field p-col-12 p-md-12">
+                <label for="disabledays">Fecha de Ingreso</label>
+                <p-calendar [(ngModel)]="usuario.fechaingreso" [disabledDates]="invalidDates" [disabledDays]="[0,6]" [readonlyInput]="true" inputId="disabledays"></p-calendar>
+            </div>
+            
+            <div class="p-field p-col-12 p-md-12">
+                <label class="p-mb-3">Cargo</label>
+                <p-dropdown [options]="cargos" placeholder="Seleccione un cargo" [(ngModel)]="usuario.cargo" required optionLabel="nombre">
+                </p-dropdown>
+            </div>
+            
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveUsuario()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

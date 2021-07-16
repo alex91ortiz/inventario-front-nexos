@@ -1,0 +1,108 @@
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+            
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="mercancias" [rows]="5" [paginator]="true"
+        [globalFilterFields]="['nombre']" [(selection)]="selectedMercancias"
+        [rowHover]="true" dataKey="id" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h3 class="p-m-0">Administracion de Mercancias</h3>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <!--<th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>-->
+                <th  pSortableColumn="nombreproducto">Nombre <p-sortIcon field="nombreproducto"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="cantidad">Cantidad <p-sortIcon field="cantidad"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="usuarioingreso">Usuario iniciador <p-sortIcon field="usuarioingreso"></p-sortIcon>
+                </th>
+                <th  pSortableColumn="fechaingreso">Fecha de Ingreso <p-sortIcon field="fechaingreso"></p-sortIcon>
+                </th>
+                <th style="width: 10rem"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mercancia>
+            <tr>
+                <!--<td>
+                    <p-tableCheckbox [value]="mercancia"></p-tableCheckbox>
+                </td>-->
+                <td>{{mercancia.nombreproducto}}</td>
+                <td>{{mercancia.cantidad}}</td>
+                <td>{{(mercancia.usuarioingreso)? mercancia.usuarioingreso.nombre : null}}</td>
+                <td>{{mercancia.fechaingreso | date: 'yyyy-mm-dd'}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editMercancia(mercancia)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                        (click)="deleteMercancia(mercancia)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                En total hay {{mercancias ? mercancias.length : 0 }} Kpis de mercancias.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="mercanciaDialog" resizable="false" modal="true" [style]="{width: '60vw'}" header="Mercancias Details" [modal]="true">
+    <ng-template pTemplate="content">
+        <div class="p-fluid p-formgrid p-grid">
+            <div class="p-field p-col-12 p-md-12">
+                <label for="name">Nombre del producto</label>
+                <input type="text" pInputText id="nombreproducto" [(ngModel)]="mercancia.nombreproducto" required autofocus />
+                <small class="p-invalid" *ngIf="submitted && !mercancia.nombreproducto">Nombre es requerido.</small>
+            </div>
+            <div class="p-field p-col-12 p-md-12">
+                <label for="name">Cantidad</label>
+                <input type="number" pInputText id="cantidad" [(ngModel)]="mercancia.cantidad" required autofocus />
+                <small class="p-invalid" *ngIf="submitted && !mercancia.cantidad">Edad es requerido.</small>
+            </div>
+            <div class="p-field p-col-12 p-md-12">
+                <label for="disabledays">Fecha de Ingreso</label>
+                <p-calendar [(ngModel)]="mercancia.fechaingreso" [style]="{'width':'30%'}" [inputStyle]="{'width':'30%'}" [maxDate]="maxDate" [minDate]="minDate" [readonlyInput]="true" inputId="min-max"></p-calendar>
+                <small class="p-invalid" *ngIf="submitted && !mercancia.fechaingreso">Fecha es requerido.</small>
+            </div>
+            
+            <div *ngIf="isAdd" class="p-field p-col-12 p-md-12">
+                <label class="p-mb-3">Usuario iniciador</label>
+                <p-dropdown [options]="usuarios" placeholder="Seleccione un usuario" [(ngModel)]="mercancia.usuarioingreso" required optionLabel="nombre">
+                </p-dropdown>
+                <small class="p-invalid" *ngIf="submitted && !mercancia.usuarioingreso">Usuario es requerido.</small>
+            </div>
+            <div *ngIf="!isAdd" class="p-field p-col-12 p-md-12">
+                <label class="p-mb-3">Usuario actualizacion</label>
+                <p-dropdown [options]="usuarios" placeholder="Seleccione un usuario" [(ngModel)]="mercancia.usuarioactual" required optionLabel="nombre">
+                </p-dropdown>
+                <small class="p-invalid" *ngIf="submitted && !mercancia.usuarioactual">Usuario es requerido.</small>
+            </div>
+            
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save"  icon="pi pi-check" class="p-button-text" (click)="saveMercancia()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
